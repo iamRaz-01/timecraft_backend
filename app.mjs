@@ -4,11 +4,13 @@ import bodyparser from 'body-parser'
 import mySql from 'mysql2';
 import UserService from './service/userService.mjs';
 import UserDao from './dao/userDao.mjs';
+import cors from 'cors';
 
 // get the instance of express library 
 const app = express();
 const port = 3030;
 app.use(bodyparser.json());
+app.use(cors())
 
 // data base credentials 
 const connection = mySql.createPool({
