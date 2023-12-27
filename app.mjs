@@ -2,6 +2,8 @@
 import express from 'express';
 import bodyparser from 'body-parser'
 import mySql from 'mysql2';
+import UserService from './service/userService.mjs';
+import UserDao from './dao/userDao.mjs';
 
 // get the instance of express library 
 const app = express();
@@ -57,5 +59,24 @@ function connectionQuery(query, data, callback) {
 // code is running on Server 
 app.listen(port, () => {
     console.log("server is running ");
+})
+
+app.post('/api/user/create', async (req, res) => {
+    try {
+        let data = req.body;
+        let service = new UserService();
+        let result = await service.createUser(data);
+        res.json({ 'status': 200, 'token': result })
+    }
+    catch (error) {
+        res.json({ 'status': 500, 'error': error.message })
+    }
+})
+app.get('/api/user/getalluser', async (req, res) => {
+    let dao = new UserDao()
+    let result = await dao.getAllUser();
+
+    res.json({ 'status': 200, 'result': result })
+
 })
 export { connectionQuery }

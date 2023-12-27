@@ -1,5 +1,19 @@
 import { connectionQuery } from "../app.mjs";
-class User {
+class UserDao {
+
+    async createUser(data) {
+        return new Promise((resolve, reject) => {
+            connectionQuery("insert into user set ?", data, (result) => {
+                if (result === null) {
+                    reject("Failed to execute the query.");
+                } else {
+                    let id = result.insertId;
+                    resolve(id);
+                }
+            });
+
+        });
+    }
     async getAllUser() {
         return new Promise((resolve, reject) => {
             connectionQuery("SELECT * FROM user", undefined, (result) => {
@@ -43,10 +57,6 @@ class User {
 
 
 }
-try {
-    const user = new User()
-    console.log(await user.getUserById(1))
-} catch (e) {
-    console.log(e)
-}
 
+
+export default UserDao;
