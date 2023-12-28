@@ -51,6 +51,22 @@ class UserDao {
 
         });
 
+
+    }
+
+
+    async updateLogin(id) {
+        return new Promise((resolve, reject) => {
+            connectionQuery("UPDATE user SET is_login = true  WHERE  user_id = ? ", id, (result) => {
+                if (result === null) {
+                    reject("Failed to execute the query.");
+                } else {
+                    resolve(result);
+                }
+            });
+
+        });
+
     }
 
 

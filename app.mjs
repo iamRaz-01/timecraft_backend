@@ -68,6 +68,17 @@ app.post('/api/user/create', async (req, res) => {
         let data = req.body;
         let service = new UserService();
         let result = await service.createUser(data);
+        res.json({ 'status': 200, 'message': 'success' })
+    }
+    catch (error) {
+        res.json({ 'status': 500, 'error': error.message })
+    }
+})
+app.put('/api/user/login', async (req, res) => {
+    try {
+        let data = req.body;
+        let service = new UserService();
+        let result = await service.login(data);
         res.json({ 'status': 200, 'token': result })
     }
     catch (error) {
