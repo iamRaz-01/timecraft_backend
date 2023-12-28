@@ -5,6 +5,7 @@ import mySql from 'mysql2';
 import UserService from './service/userService.mjs';
 import UserDao from './dao/userDao.mjs';
 import cors from 'cors';
+import TagService from './service/tagService.mjs';
 
 // get the instance of express library 
 const app = express();
@@ -62,13 +63,15 @@ function connectionQuery(query, data, callback) {
 app.listen(port, () => {
     console.log("server is running ");
 })
+const userService = new UserService();
+const tagService = new TagService();
 
+// user
 app.post('/api/user/create', async (req, res) => {
     try {
         let data = req.body;
-        let service = new UserService();
-        let result = await service.createUser(data);
-        res.json({ 'status': 200, 'message': 'success' })
+        let result = await userService.createUser(data);
+        res.status(200).json({ 'status': 200, 'message': 'success' })
     }
     catch (error) {
         res.json({ 'status': 500, 'error': error.message })
@@ -77,9 +80,8 @@ app.post('/api/user/create', async (req, res) => {
 app.put('/api/user/login', async (req, res) => {
     try {
         let data = req.body;
-        let service = new UserService();
-        let result = await service.login(data);
-        res.json({ 'status': 200, 'token': result })
+        let result = await userService.login(data);
+        res.status(200).json({ 'status': 200, 'token': result })
     }
     catch (error) {
         res.json({ 'status': 500, 'error': error.message })
@@ -89,7 +91,21 @@ app.get('/api/user/getalluser', async (req, res) => {
     let dao = new UserDao()
     let result = await dao.getAllUser();
 
-    res.json({ 'status': 200, 'result': result })
+    res.status(200).json({ 'status': 200, 'result': result })
 
+})
+
+// Tag 
+app.post('/api/tag/create', async (req, res) => {
+    let data = req.body;
+    console.log(JSON.stringify(data))
+    try {
+        let user_id = await userService.authorizedUser(data.token);
+        data = { user_id, tag_name: data.tag_name };
+        let result = await tagService.createTag(data);
+        res.status(200).json({ 'status': 200, 'message': 'success', 'data': result })
+    } catch (error) {
+        res.json({ 'status': 500, 'error': error.message })
+    }
 })
 export { connectionQuery }

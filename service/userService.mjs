@@ -1,14 +1,36 @@
 import UserDao from "../dao/userDao.mjs";
 class UserService {
     userDao = new UserDao();
-    async isUser(email) {
+    async authorizedUser(token) {
+        try {
+            token = decryptToken(token);
+            let tokenArr = token.split('.com');
+            console.log(tokenArr)
+            let email = tokenArr[0] + '.com'
+            console.log(email)
+            if (await this.isUserByEmail(email)) {
+                return tokenArr[1];
+            } else return false;
+
+        } catch (error) {
+            throw new Error('Invalid Token')
+
+        }
+
+    }
+    async isUserByEmail(email) {
         const check = await this.userDao.getUserByEmail(email);
+        if (check.length === 0) return false;
+        else return true; // existing user
+    }
+    async isUserById(id) {
+        const check = await this.userDao.getUserById(id);
         if (check.length === 0) return false;
         else return true; // existing user
     }
     async createUser(data) {
         try {
-            if (!await this.isUser(data.email)) {
+            if (!await this.isUserByEmail(data.email)) {
                 return await this.userDao.createUser(data);
             } else throw new Error("user exists")
         } catch (error) {
