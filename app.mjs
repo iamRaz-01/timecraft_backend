@@ -108,4 +108,14 @@ app.post('/api/tag/create', async (req, res) => {
         res.json({ 'status': 500, 'error': error.message })
     }
 })
+app.post('/api/tag/getalltags', async (req, res) => {
+    let data = req.body;
+    try {
+        let user_id = await userService.authorizedUser(data.token);
+        let result = await tagService.getAllTags(user_id);
+        res.status(200).json({ 'status': 200, 'message': 'success', 'data': result })
+    } catch (error) {
+        res.json({ 'status': 500, 'error': error.message })
+    }
+})
 export { connectionQuery }

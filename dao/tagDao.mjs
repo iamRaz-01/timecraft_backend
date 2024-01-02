@@ -24,6 +24,9 @@ class TagDao {
         });
     }
 
+
 }
+let tag = new TagDao();
+console.log(await tag.getAllTags(1))
 
 export default TagDao;
