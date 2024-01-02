@@ -14,18 +14,19 @@ app.use(bodyparser.json());
 app.use(cors())
 
 // data base credentials 
-const connection = mySql.createPool({
-    host: 'localhost',
-    user: 'root',
-    password: '123456',
-    database: 'timecraft',
-    waitForConnections: true,
-    connectionLimit: 10,
-    queueLimit: 0,
-});
+
 
 // universal query function 
 function connectionQuery(query, data, callback) {
+    const connection = mySql.createPool({
+        host: 'localhost',
+        user: 'root',
+        password: '123456',
+        database: 'timecraft',
+        waitForConnections: true,
+        connectionLimit: 10,
+        queueLimit: 0,
+    });
     connection.getConnection((err, connect) => {
         if (err) {
             throw new Error("Database connection error: " + err.message);
