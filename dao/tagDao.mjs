@@ -23,6 +23,31 @@ class TagDao {
 
         });
     }
+    async getTagById(id) {
+        return new Promise((resolve, reject) => {
+            connectionQuery("SELECT * FROM tag where tag_id  = ? ", id, (result) => {
+                if (result === null) {
+                    reject("Failed to execute the query.");
+                } else {
+                    resolve(result);
+                }
+            });
+
+        });
+    }
+    async getTagByName(id) {
+        return new Promise((resolve, reject) => {
+            connectionQuery("SELECT * FROM tag where tag_name  = ? ", id, (result) => {
+                if (result === null) {
+                    reject("Failed to execute the query.");
+                } else {
+                    resolve(result);
+                }
+            });
+
+        });
+    }
+
 
 
 }

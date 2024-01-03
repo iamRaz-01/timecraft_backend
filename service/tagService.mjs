@@ -19,5 +19,17 @@ class TagService {
             throw new Error('invalid user')
         }
     }
+    async getTagById(id) {
+        const tagDao = new TagDao();
+        const check = await tagDao.getTagById(id);
+        if (check.length === 0) return false;
+        else return true; // existing tag
+    }
+    async getTagByName(name) {
+        const tagDao = new TagDao();
+        const check = await tagDao.getTagByName(name);
+        if (check.length === 0) return false;
+        else return check;
+    }
 }
 export default TagService

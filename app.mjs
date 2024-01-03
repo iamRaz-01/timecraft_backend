@@ -1,11 +1,12 @@
 // importing the required packages 
-import express from 'express';
+import express, { json } from 'express';
 import bodyparser from 'body-parser'
 import mySql from 'mysql2';
 import UserService from './service/userService.mjs';
 import UserDao from './dao/userDao.mjs';
 import cors from 'cors';
 import TagService from './service/tagService.mjs';
+import TaskService from './service/taskService.mjs'
 
 // get the instance of express library 
 const app = express();
@@ -15,18 +16,18 @@ app.use(cors())
 
 // data base credentials 
 
-
+const connection = mySql.createPool({
+    host: 'localhost',
+    user: 'root',
+    password: '123456',
+    database: 'timecraft',
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0,
+});
 // universal query function 
 function connectionQuery(query, data, callback) {
-    const connection = mySql.createPool({
-        host: 'localhost',
-        user: 'root',
-        password: '123456',
-        database: 'timecraft',
-        waitForConnections: true,
-        connectionLimit: 10,
-        queueLimit: 0,
-    });
+
     connection.getConnection((err, connect) => {
         if (err) {
             throw new Error("Database connection error: " + err.message);
@@ -66,6 +67,7 @@ app.listen(port, () => {
 })
 const userService = new UserService();
 const tagService = new TagService();
+const taskService = new TaskService();
 
 // user
 app.post('/api/user/create', async (req, res) => {
@@ -91,8 +93,20 @@ app.put('/api/user/login', async (req, res) => {
 app.get('/api/user/getalluser', async (req, res) => {
     let dao = new UserDao()
     let result = await dao.getAllUser();
-
     res.status(200).json({ 'status': 200, 'result': result })
+})
+app.get('/api/user/profile_pic', async (req, res) => {
+    try {
+        const token = req.headers['apitoken'];
+        let service = new UserService()
+        let user_id = await service.authorizedUser(token);
+        const userService = new UserService();
+        const result = await userService.getProfileById(user_id);
+        res.status(200).json({ 'status': 200, 'data': result })
+    } catch (error) {
+        res.status(200).json({ 'status': 500, 'error': error.message })
+    }
+
 
 })
 
@@ -114,6 +128,18 @@ app.post('/api/tag/getalltags', async (req, res) => {
     try {
         let user_id = await userService.authorizedUser(data.token);
         let result = await tagService.getAllTags(user_id);
+        res.status(200).json({ 'status': 200, 'message': 'success', 'data': result })
+    } catch (error) {
+        res.json({ 'status': 500, 'error': error.message })
+    }
+})
+app.post('/api/task/create', async (req, res) => {
+    let data = req.body;
+    try {
+        const user_id = await userService.authorizedUser(data.token);
+        const tag = await tagService.getTagByName(data.tag_id);
+        const json = { 'title': data.title, 'description': data.description, 'due_date': data.due_date, 'timer': data.timer, 'tag_id': tag[0].tag_id, 'priority': data.priority }
+        let result = await taskService.createTask(json);
         res.status(200).json({ 'status': 200, 'message': 'success', 'data': result })
     } catch (error) {
         res.json({ 'status': 500, 'error': error.message })

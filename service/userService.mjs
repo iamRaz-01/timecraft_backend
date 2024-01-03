@@ -5,16 +5,22 @@ class UserService {
         try {
             token = decryptToken(token);
             let tokenArr = token.split('.com');
-            console.log(tokenArr)
             let email = tokenArr[0] + '.com'
-            console.log(email)
             if (await this.isUserByEmail(email)) {
                 return tokenArr[1];
             } else return false;
 
         } catch (error) {
-            throw new Error('Invalid Token')
+            throw new Error('Invalid Api Token')
 
+        }
+
+    }
+    async getProfileById(id) {
+        if (await this.isUserById(id)) {
+            return await this.userDao.getProfilePic(id);
+        } else {
+            throw new Error('Invalid User');
         }
 
     }
@@ -53,15 +59,6 @@ class UserService {
         }
     }
 }
-let data = {
-    username: 'razak',
-    email: 'abdulrazak@gmail.com',
-    password: '123445',
-}
-
-
-
-
 
 function encryptToken(email, id) {
     let string = email + id;
