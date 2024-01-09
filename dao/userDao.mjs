@@ -45,6 +45,21 @@ class UserDao {
       });
     });
   }
+  async getProfilePic(id) {
+    return new Promise((resolve, reject) => {
+      connectionQuery(
+        "SELECT profile_image FROM user where user_id = ?",
+        id,
+        (result) => {
+          if (result === null) {
+            reject("Failed to execute the query.");
+          } else {
+            resolve(result);
+          }
+        }
+      );
+    });
+  }
   async getUserById(id) {
     return new Promise((resolve, reject) => {
       connectionQuery("SELECT * FROM user where user_id = ?", id, (result) => {
